@@ -1,7 +1,7 @@
 [package]
 name = "parser_rickneelee"
 authors = ["rickneelee"]
-description = "Code for parsing lists of integers."
+description = "Parser for the register of cultural monuments of Ukraine."
 version = "0.1.0"
 edition = "2021"
 license = "MIT"

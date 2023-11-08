@@ -1,9 +1,24 @@
-peg::parser!{
-    pub grammar list_parser() for str{
-     rule number() -> u32 
-      = n:$(['0'..='9']+) {? n.parse().or(Err("u32"))}
-  
-     pub rule list() -> Vec<u32>
-       = "[" l:(number() ** ",") "]" { l }
+peg::parser! {
+  pub grammar monument_parser() for str {
+       rule century() -> u32
+           = n:$(['0'..='9']+) {?
+               let century_num = n.parse::<u32>();
+               if let Ok(century) = century_num {
+                   if century <= 21 &&  century > 0{
+                       Ok(century)
+                   } else {
+                       Err("Century must be between 1 and 21")
+                   }
+               } else {
+                   Err("Invalid century format")
+               }
+           }
+
+       pub rule monument() -> (String, (u32, u32))
+           = name:$(['a'..='z' | 'A'..='Z']+) _ first:century() _ second:century() {
+               (name.to_string(), (first * 100 - 99, second  * 100))
+           }
+
+       rule _() = [' ' | '\t' | '\n']*
    }
-  }
+}
