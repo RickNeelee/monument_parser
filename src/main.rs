@@ -1,37 +1,46 @@
-peg::parser! {
-  pub grammar monument_parser() for str {
-       rule century() -> u32
-           = n:$(['0'..='9']+) {?
-               let century_num = n.parse::<u32>();
-               if let Ok(century) = century_num {
-                   if century <= 21 &&  century > 0{
-                       Ok(century)
-                   } else {
-                       Err("Century must be between 1 and 21")
-                   }
-               } else {
-                   Err("Invalid century format")
-               }
-           }
-
-       pub rule monument() -> (String, (u32, u32))
-           = name:$(['a'..='z' | 'A'..='Z']+) _ first:century() _ second:century() {
-               (name.to_string(), (first * 100 - 99, second  * 100))
-           }
-
-       rule _() = [' ' | '\t' | '\n']*
-   }
-}
+use clap::{Arg, App};
+use monument_parser::monument_parser;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn main() {
-   let input = "Church 9 11";
-   match monument_parser::monument(input) {
-       Ok((name, (first_year, second_year))) => {
-           println!("The name of the monument: {}", name);
-           println!("Dating: {}-{}", first_year, second_year);
-       }
-       Err(e) => {
-           println!("Error: {}", e);
-       }
-   }
+    let matches = App::new("Monument Parser")
+        .version("1.0")
+        .author("Rick Neelee")
+        .about("Parser for the register of cultural monuments of Ukraine.")
+        .arg(Arg::with_name("file")
+            .short('f')
+            .long("file")
+            .value_name("FILE")
+            .help("Sets the input file to use.")
+            .takes_value(true))
+        .get_matches();
+
+    if let Some(file) = matches.value_of("file") {
+        let mut file = File::open(file).expect("Unable to open the file");
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).expect("Unable to read the file");
+
+        match monument_parser::monument(&contents) {
+            Ok((monument_type, monument_name, location, (first_year, second_year), purpose_types)) => {
+                println!("Type of monument: {}", monument_type);
+                println!("Name of the monument: {}", monument_name);
+                if location != "Invalid input" {
+                    println!("Location: {}", location);
+                } else {
+                    println!("Error: Invalid input for location");
+                }
+                println!("Dating: {}-{}", first_year, second_year);
+                if !purpose_types.is_empty() {
+                    let purposes = purpose_types.join(", ");
+                    println!("Purpose type: {}", purposes);
+                }
+            }
+            Err(e) => {
+                println!("Error: {}", e);
+            }
+        }
+    } else {
+        println!("No file provided.");
+    }
 }

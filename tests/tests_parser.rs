@@ -1,61 +1,86 @@
-#[cfg(test)] 
+#[cfg(test)]
 mod tests {
-    use parser_rickneelee::monument_parser;
-    
+    use monument_parser::monument_parser;
+
     #[test]
-    fn test_valid_monument_1() {
-        let input = "Church 9 11";
-        match monument_parser::monument(input) {
-            Ok((name, (first_year, second_year))) => {
-                assert_eq!(name, "Church");
-                assert_eq!(first_year, 801); 
-                assert_eq!(second_year, 1100); 
-            }
-            Err(_) => {
-                panic!("Parsing shouldn't fail here.");
-            }
-        }
+    fn test_century_valid() {
+        assert!(monument_parser::century("21").is_ok());
     }
     
     #[test]
-    fn test_valid_monument_2() {
-        let input = "Crypt 1 4";
-        match monument_parser::monument(input) {
-            Ok((name, (first_year, second_year))) => {
-                assert_eq!(name, "Crypt");
-                assert_eq!(first_year, 1); 
-                assert_eq!(second_year, 400); 
-            }
-            Err(_) => {
-                panic!("Parsing shouldn't fail here.");
-            }
-        }
+    #[should_panic]
+    fn test_century_invalid() {
+        assert!(monument_parser::century("22").is_ok());
     }
 
     #[test]
-    fn test_invalid_monument_1() {
-        let input = "Church 9 22";
-        match monument_parser::monument(input) {
-            Ok(_) => {
-                panic!("Parsing should fail here.");
-            }
-            Err(_) => {
-                //must fail
-            }
-        }
+    fn test_monument_type_valid() {
+        assert_eq!(monument_parser::monument_type("Monument").unwrap(), "Monument".to_string());
     }
-    
+
+    #[test]
+    #[should_panic]
+    fn test_monument_type_invalid() {
+        monument_parser::monument_type("123").unwrap();
+    }
+
+    #[test]
+    fn test_monument_name_valid() {
+        assert_eq!(monument_parser::monument_name("St. Paul's Cathedral").unwrap(), "St. Paul's Cathedral".to_string());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_monument_name_invalid() {
+        assert!(monument_parser::monument_name("12345").is_ok());
+    }
+
+    #[test]
+    fn test_settlement_location_valid() {
+        assert_eq!(monument_parser::settlement_location("1 Kyiv").unwrap(), "The city of Kyiv".to_string());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_settlement_location_invalid() {
+        monument_parser::settlement_location("4 Odesa").unwrap();
+    }
     
     #[test]
-    fn test_invalid_monument_2() {
-        let input = "Invalid Monument";
-        match monument_parser::monument(input) {
-            Ok(_) => {
-                panic!("Parsing should fail here.");
-            }
-            Err(_) => {
-                // must fail
-            }
-        }
+    fn test_purpose_types_valid() {
+        assert_eq!(
+            monument_parser::purpose_types("1,2,5").unwrap(),
+            vec!["Architectural".to_string(), "Historical".to_string(), "Archaeological".to_string()]
+        );
     }
+
+    #[test]
+    #[should_panic]
+    fn test_purpose_types_invalid() {
+        monument_parser::purpose_types("9,10").unwrap();
+    }
+
+    #[test]
+    fn test_monument_valid_input() {
+        assert!(monument_parser::monument("Church St.John 1 Kyiv 9-11 1,2,5").is_ok());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_monument_invalid_location() {
+        assert!(monument_parser::monument("Church St.John 4 Kyiv 9-11 1,2,5").is_ok());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_monument_invalid_century_range() {
+        assert!(monument_parser::monument("Church St.John 1 Kyiv 0-11 1,2,5").is_ok());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_monument_empty_purpose() {
+        assert!(monument_parser::monument("Church St.John 1 Kyiv 9-11").is_ok());
+    }
+
 }
