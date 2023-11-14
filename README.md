@@ -48,5 +48,5 @@ Rules: Use codes '1' to '8' to represent different purposes:
 "8": Science and technology  
  
 **Example of input information: "Church St.John 1 Kyiv 9 11 1,2,5".**   
-**Crate on crates.io: https://crates.io/crates/monument_parser** 
+**Crate on crates.io: https://crates.io/crates/monument_parser**   
 **To run, use the terminal and enter: "cargo run -- -f test_file.txt"**   
