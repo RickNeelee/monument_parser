@@ -3,9 +3,11 @@
 **The parser was created to update and support information about immovable cultural monuments of Ukraine in a single format.**  
 
 **Installation**  
-Add the parser_rickneelee crate as a dependency in your Rust project's Cargo.toml file:  
-[dependencies]  
-monument_parser = "1.0.0"  
+Run the following Cargo command in your project directory:
+cargo add monument_parser
+
+Or add the following line to your Cargo.toml:
+monument_parser = "1.0.1" 
 
 **Each cultural object has a building type, name, location, dating and purpose type.**    
 
